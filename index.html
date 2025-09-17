@@ -1,68 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Crimson Game Portal</title>
   <style>
     body {
       margin: 0;
-      background: black;
+      height: 100vh;
+      background: linear-gradient(135deg, #000000, #2a0000, #4b0000, crimson);
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial Black', sans-serif;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      position: relative;
+      overflow: hidden;
     }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Canvas for particle animation */
+    #particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
     .title {
-      font-size: 40px;
+      font-size: 60px;
       font-weight: bold;
-      border: 3px solid white;
-      padding: 20px 40px;
-      margin-bottom: 30px;
       text-transform: uppercase;
+      color: crimson;
+      text-shadow: 0 0 10px crimson, 0 0 20px crimson, 0 0 40px #ff0040;
+      margin-bottom: 50px;
+      letter-spacing: 4px;
+      animation: glowPulse 2s infinite alternate;
+      z-index: 1;
     }
+
+    @keyframes glowPulse {
+      from { text-shadow: 0 0 10px crimson, 0 0 20px crimson; }
+      to { text-shadow: 0 0 20px #ff0040, 0 0 40px #ff0040; }
+    }
+
     .play-button {
       background: white;
       color: black;
       border: none;
-      padding: 15px 30px;
-      font-size: 20px;
+      padding: 20px 50px;
+      font-size: 22px;
       font-weight: bold;
+      border-radius: 50px;
       cursor: pointer;
-      border-radius: 5px;
+      box-shadow: 0 0 10px white;
+      transition: all 0.3s ease;
+      z-index: 1;
     }
+
     .play-button:hover {
       background: crimson;
       color: white;
+      transform: scale(1.1);
+      box-shadow: 0 0 20px crimson, 0 0 40px crimson;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+      color: crimson;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 0 0 5px crimson, 0 0 15px crimson;
+      opacity: 0.9;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
-  <div class="title">CRIMSON GAME PORTAL</div>
+  <canvas id="particles"></canvas>
+
+  <div class="title">CRIMSON PORTAL</div>
   <button class="play-button" onclick="openGame()">▶ PLAY FULLSCREEN</button>
+  <div class="watermark">CRIMSON</div>
 
   <script>
     function openGame() {
-      // Opens your Crimson site
       const gameURL = "https://typicalproduction.my.canva.site/#games";
-      
-      const newWin = window.open("about:blank", "_blank");
-      newWin.document.write(`
-        <html>
-        <head>
-          <title>Crimson Game</title>
-          <style>
-            body, html { margin:0; padding:0; height:100%; background:black; }
-            iframe { border:none; width:100%; height:100%; }
-          </style>
-        </head>
-        <body>
-          <iframe src="${gameURL}" allowfullscreen></iframe>
-        </body>
-        </html>
-      `);
+      window.open(gameURL, "_blank", "noopener,noreferrer");
     }
+
+    // Particle animation
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const numParticles = 80;
+
+    for (let i = 0; i < numParticles; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2 + 1,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: (Math.random() - 0.5) * 0.5,
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,0,50,0.8)";
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      });
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // Resize canvas on window resize
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
   </script>
 </body>
 </html>
